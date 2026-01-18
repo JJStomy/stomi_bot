@@ -137,13 +137,3 @@ def training_lang_keyboard():
 
     return keyboard.as_markup()
 
-def server_comm_keyboard():
-    buttons = []
-
-    buttons.append(Button('Выполнить', CallbackServerMenu(button='exec')))
-    buttons.append(Button('Назад', CallbackMainMenu(button='start')))
-    keyboard = get_keyboard(buttons)
-    # keyboard.adjust(1)
-
-
-    return keyboard.as_markup()

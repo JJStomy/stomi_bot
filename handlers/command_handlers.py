@@ -12,7 +12,8 @@ from ai_open.settings import GPTRole
 from keyboards.callbacks import CallbackMainMenu, CallbackTalkMenu, CallbackQuizMenu, CallbackLangMenu, \
     CallbackServerMenu
 from keyboards.inline_kb import main_keyboard, random_keyboard, cancel_keyboard, talk_keyboard, quiz_keyboard, \
-    lang_keyboard, server_comm_keyboard
+    lang_keyboard
+from keyboards.server_keyboards import server_comm_keyboard
 from utils import FileManager
 from utils import Paths
 from .fsm import GPTRequest, CelebrityTalk, QUIZ, Translate, Server
@@ -210,31 +211,3 @@ async def on_server(callback: CallbackQuery, callback_data: CallbackMainMenu, st
     #     reply_markup=cancel_keyboard(),
     # )
 
-@command_router.callback_query(CallbackServerMenu.filter(F.button == 'exec'))
-async def on_exec(callback: CallbackQuery, callback_data: CallbackServerMenu, state: FSMContext, bot: Bot):
-    print(callback_data.button)
-    await state.clear()
-    # await state.set_state(Translate.translate)
-
-    await state.set_state(Server.command)
-    await state.update_data(message_id=callback.message.message_id)
-
-    # await bot.send_message(callback.message.chat.id, 'Введите команду:', reply_markup=cancel_keyboard())
-
-    await bot.edit_message_text(
-        text='Введите команду:',
-        chat_id=callback.from_user.id,
-        message_id=callback.message.message_id,
-        reply_markup=cancel_keyboard()
-    )
-
-
-    # await bot.edit_message_media(
-    #     media=InputMediaPhoto(
-    #         media=FSInputFile(Paths.IMAGES.value.format(file=callback_data.language)),
-    #         caption=FileManager.read_file(Paths.MESSAGES, callback_data.language),
-    #     ),
-    #     chat_id=callback.from_user.id,
-    #     message_id=callback.message.message_id,
-    #     reply_markup=cancel_keyboard(),
-    # )

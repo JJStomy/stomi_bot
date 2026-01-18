@@ -18,4 +18,4 @@ class CallbackLangMenu(CallbackData, prefix='LANG'):
 
 class CallbackServerMenu(CallbackData, prefix='SERV'):
     button: str
-    # command_type: str
+    command_type: str

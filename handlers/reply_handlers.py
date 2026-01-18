@@ -8,8 +8,7 @@ from aiogram.types.input_file import FSInputFile
 from ai_open import chat_gpt
 from ai_open.messages import GPTMessage
 from ai_open.settings import GPTRole
-from keyboards.inline_kb import gpt_keyboard, cancel_keyboard, quiz_answer_keyboard, translate_keyboard, \
-    server_comm_keyboard
+from keyboards.inline_kb import gpt_keyboard, cancel_keyboard, quiz_answer_keyboard, translate_keyboard
 from utils import Paths
 from .fsm import GPTRequest, CelebrityTalk, QUIZ, Translate, Server
 
@@ -112,44 +111,3 @@ async def wait_for_user_text(message: Message, state: FSMContext, bot: Bot):
         reply_markup=translate_keyboard(),
     )
 
-@reply_router.message(Server.command)
-async def wait_for_user_command(message: Message, state: FSMContext, bot: Bot):
-    # msg_list = GPTMessage('gpt')
-    # msg_list.update(GPTRole.USER, message.text)
-
-    err = False
-
-    msg = message.text
-    try:
-        output = subprocess.run(msg.split(' '), capture_output=True, text=True)
-    except Exception as e:
-        err_msg = e.stdout.decode()
-        err = True
-
-
-    # print(output.stdout)
-    if err:
-        out_msg = err_msg
-    else:
-        out_msg = output.stdout
-
-    await bot.delete_message(message.from_user.id, message.message_id)
-    # response = await chat_gpt.request(msg_list, bot)
-    message_id = await state.get_value("message_id")
-
-    await bot.edit_message_text(
-        text=out_msg,
-        chat_id=message.from_user.id,
-        message_id=message_id,
-        reply_markup=server_comm_keyboard(),
-    )
-
-    # await bot.edit_message_media(
-    #     media=InputMediaPhoto(
-    #         media=FSInputFile(Paths.IMAGES.value.format(file='gpt')),
-    #         caption=response,
-    #     ),
-    #     chat_id=message.from_user.id,
-    #     message_id=message_id,
-    #     reply_markup=gpt_keyboard(),
-    # )

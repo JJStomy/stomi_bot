@@ -5,7 +5,7 @@ class FileManager:
 
     @staticmethod
     def read_file(path: Paths, file_name: str) -> str:
-        if not file_name.endswith(".txt"):
+        if file_name.count('.') == 0:
             file_name += ".txt"
 
         file_path = os.path.join(path.value, file_name)
