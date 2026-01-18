@@ -120,7 +120,7 @@ async def wait_for_user_command(message: Message, state: FSMContext, bot: Bot):
     msg = message.text
     try:
         output = subprocess.run(msg.split(' '), capture_output=True, text=True)
-    except subprocess.CalledProcessError as e:
+    except Exception as e:
         err_msg = e.stdout.decode()
         err = True
 
