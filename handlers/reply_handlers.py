@@ -118,17 +118,25 @@ async def wait_for_user_command(message: Message, state: FSMContext, bot: Bot):
     # msg_list.update(GPTRole.USER, message.text)
 
     msg = message.text
-    output = subprocess.run(msg.split(' '), capture_output=True, text=True)
+    try:
+        output = subprocess.run(msg.split(' '), capture_output=True, text=True)
+    except subprocess.CalledProcessError as e:
+        err_msg = e.stdout.decode()
+        err = True
+
 
     # print(output.stdout)
-
+    if err:
+        out_msg = err_msg
+    else:
+        out_msg = output.stdout
 
     await bot.delete_message(message.from_user.id, message.message_id)
     # response = await chat_gpt.request(msg_list, bot)
     message_id = await state.get_value("message_id")
 
     await bot.edit_message_text(
-        text=output.stdout,
+        text=out_msg,
         chat_id=message.from_user.id,
         message_id=message_id,
         reply_markup=server_comm_keyboard(),
