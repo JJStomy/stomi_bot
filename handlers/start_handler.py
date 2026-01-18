@@ -15,6 +15,6 @@ async def on_start(message: Message, command: CommandObject):
     await message.answer_photo(
         photo=FSInputFile(Paths.IMAGES.value.format(file=command.command)),
         caption=FileManager.read_file(Paths.MESSAGES, command.command),
-        reply_markup = main_keyboard(),
+        reply_markup = main_keyboard(message.from_user.id),
     )
 

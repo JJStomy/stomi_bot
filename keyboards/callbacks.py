@@ -11,3 +11,11 @@ class CallbackTalkMenu(CallbackData, prefix='TALK'):
 class CallbackQuizMenu(CallbackData, prefix='QUIZ'):
     button: str
     subject: str
+
+class CallbackLangMenu(CallbackData, prefix='LANG'):
+    button: str
+    language: str
+
+class CallbackServerMenu(CallbackData, prefix='SERV'):
+    button: str
+    # command_type: str

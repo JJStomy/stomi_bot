@@ -8,3 +8,12 @@ class CelebrityTalk(StatesGroup):
 
 class QUIZ(StatesGroup):
     game = State()
+
+class Translate(StatesGroup):
+    translate = State()
+
+class Training(StatesGroup):
+    training = State()
+
+class Server(StatesGroup):
+    command = State()

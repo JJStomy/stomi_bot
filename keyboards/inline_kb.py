@@ -3,8 +3,9 @@ from collections import namedtuple
 
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
+import config
 from utils import Paths, FileManager
-from .callbacks import CallbackMainMenu, CallbackTalkMenu, CallbackQuizMenu
+from .callbacks import CallbackMainMenu, CallbackTalkMenu, CallbackQuizMenu, CallbackLangMenu, CallbackServerMenu
 
 Button = namedtuple('Button', ['text', 'callback'])
 
@@ -16,13 +17,18 @@ def get_keyboard(buttons):
 
     return keyboard
 
-def main_keyboard():
+def main_keyboard(user):
     buttons = [
         Button('Рандомный факт', CallbackMainMenu(button='random')),
         Button('Спросить ChatGPT', CallbackMainMenu(button='gpt')),
         Button('Разговор со звездой', CallbackMainMenu(button='talk')),
         Button('Квиз', CallbackMainMenu(button='quiz')),
+        Button('Переводчик', CallbackMainMenu(button='translate')),
+        # Button('Тренировка', CallbackMainMenu(button='training')),
     ]
+
+    if user == config.ADMIN_ID:
+        buttons.append(Button('Server', CallbackMainMenu(button='server')))
 
     keyboard = get_keyboard(buttons)
     keyboard.adjust(2, 2)
@@ -83,7 +89,61 @@ def quiz_answer_keyboard():
 
         Button('Сменить тему', CallbackMainMenu(button='quiz')),
         Button('Закончить', CallbackMainMenu(button='start')),
-        Button('Биология>', CallbackQuizMenu(button='quiz', subject='quiz_more')),
+        Button('Еще вопрос', CallbackQuizMenu(button='quiz', subject='quiz_more')),
     ]
 
     return get_keyboard(buttons).as_markup()
+
+def lang_keyboard():
+    languages = [file.rsplit('.', 1)[0] for file in os.listdir(Paths.IMAGES_DIR.value) if file.startswith('translate_')]
+
+    buttons = []
+    for lang in languages:
+        text = FileManager.read_file(Paths.PROMPTS, lang).split('на ', 1)[1].split(' ', 1)[0].capitalize()
+        buttons.append(
+            Button(text, CallbackLangMenu(button='translate', language=lang)),
+        )
+
+    buttons.append(Button('Назад', CallbackMainMenu(button='start')))
+    keyboard = get_keyboard(buttons)
+    keyboard.adjust(1)
+
+
+    return keyboard.as_markup()
+
+def translate_keyboard():
+    buttons = [
+
+        Button('Сменить язык', CallbackMainMenu(button='translate')),
+        Button('Закончить', CallbackMainMenu(button='start')),
+    ]
+
+    return get_keyboard(buttons).as_markup()
+
+def training_lang_keyboard():
+    languages = [file.rsplit('.', 1)[0] for file in os.listdir(Paths.IMAGES_DIR.value) if file.startswith('training_')]
+
+    buttons = []
+    for lang in languages:
+        text = FileManager.read_file(Paths.PROMPTS, lang).split('на ', 1)[1].split(' ', 1)[0].capitalize()
+        buttons.append(
+            Button(text, CallbackLangMenu(button='training', language=lang)),
+        )
+
+    buttons.append(Button('Назад', CallbackMainMenu(button='start')))
+    keyboard = get_keyboard(buttons)
+    keyboard.adjust(1)
+
+
+    return keyboard.as_markup()
+
+def server_comm_keyboard():
+    buttons = []
+
+    buttons.append(Button('Выполнить', CallbackServerMenu(button='exec')))
+    buttons.append(Button('Назад', CallbackMainMenu(button='start')))
+    keyboard = get_keyboard(buttons)
+    # keyboard.adjust(1)
+
+
+    return keyboard.as_markup()

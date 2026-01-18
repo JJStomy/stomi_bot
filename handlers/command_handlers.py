@@ -1,3 +1,5 @@
+import os, shutil
+
 from aiogram import Router, Bot, F
 from aiogram.enums.chat_action import ChatAction
 from aiogram.fsm.context import FSMContext
@@ -7,11 +9,13 @@ from aiogram.types.input_file import FSInputFile
 from ai_open import chat_gpt
 from ai_open.messages import GPTMessage
 from ai_open.settings import GPTRole
-from keyboards.callbacks import CallbackMainMenu, CallbackTalkMenu, CallbackQuizMenu
-from keyboards.inline_kb import main_keyboard, random_keyboard, cancel_keyboard, talk_keyboard, quiz_keyboard
+from keyboards.callbacks import CallbackMainMenu, CallbackTalkMenu, CallbackQuizMenu, CallbackLangMenu, \
+    CallbackServerMenu
+from keyboards.inline_kb import main_keyboard, random_keyboard, cancel_keyboard, talk_keyboard, quiz_keyboard, \
+    lang_keyboard, server_comm_keyboard
 from utils import FileManager
 from utils import Paths
-from .fsm import GPTRequest, CelebrityTalk, QUIZ
+from .fsm import GPTRequest, CelebrityTalk, QUIZ, Translate, Server
 
 command_router = Router()
 
@@ -47,7 +51,7 @@ async def on_main(callback: CallbackQuery, callback_data: CallbackMainMenu, stat
         ),
         chat_id=callback.from_user.id,
         message_id=callback.message.message_id,
-        reply_markup=main_keyboard(),
+        reply_markup=main_keyboard(callback.from_user.id),
     )
 
 @command_router.callback_query(CallbackMainMenu.filter(F.button == 'gpt'))
@@ -134,3 +138,103 @@ async def on_quiz(callback: CallbackQuery, callback_data: CallbackQuizMenu, stat
         message_id=callback.message.message_id,
         reply_markup=cancel_keyboard(),
     )
+
+@command_router.callback_query(CallbackMainMenu.filter(F.button == 'translate'))
+async def on_translate(callback: CallbackQuery, callback_data: CallbackMainMenu, state: FSMContext, bot: Bot):
+    # await state.clear()
+    # await state.set_state(GPTRequest.wait_for_request)
+    # await state.update_data(message_id=callback.message.message_id)
+
+    await bot.edit_message_media(
+        media=InputMediaPhoto(
+            media=FSInputFile(Paths.IMAGES.value.format(file=callback_data.button)),
+            caption=FileManager.read_file(Paths.MESSAGES, callback_data.button),
+        ),
+        chat_id=callback.from_user.id,
+        message_id=callback.message.message_id,
+        reply_markup=lang_keyboard(),
+    )
+
+@command_router.callback_query(CallbackLangMenu.filter(F.button == 'translate'))
+async def on_lang(callback: CallbackQuery, callback_data: CallbackLangMenu, state: FSMContext, bot: Bot):
+    await state.clear()
+    await state.set_state(Translate.translate)
+    await state.update_data(message_id=callback.message.message_id)
+    await state.update_data(language=callback_data.language)
+
+
+    await bot.edit_message_media(
+        media=InputMediaPhoto(
+            media=FSInputFile(Paths.IMAGES.value.format(file=callback_data.language)),
+            caption=FileManager.read_file(Paths.MESSAGES, callback_data.language),
+        ),
+        chat_id=callback.from_user.id,
+        message_id=callback.message.message_id,
+        reply_markup=cancel_keyboard(),
+    )
+
+@command_router.callback_query(CallbackLangMenu.filter(F.button == 'training'))
+async def on_training(callback: CallbackQuery, callback_data: CallbackLangMenu, state: FSMContext, bot: Bot):
+    await state.clear()
+    await state.set_state(Translate.translate)
+    await state.update_data(message_id=callback.message.message_id)
+    await state.update_data(language=callback_data.language)
+
+
+    await bot.edit_message_media(
+        media=InputMediaPhoto(
+            media=FSInputFile(Paths.IMAGES.value.format(file=callback_data.language)),
+            caption=FileManager.read_file(Paths.MESSAGES, callback_data.language),
+        ),
+        chat_id=callback.from_user.id,
+        message_id=callback.message.message_id,
+        reply_markup=cancel_keyboard(),
+    )
+
+@command_router.callback_query(CallbackMainMenu.filter(F.button == 'server'))
+async def on_server(callback: CallbackQuery, callback_data: CallbackMainMenu, state: FSMContext, bot: Bot):
+    total, used, free = shutil.disk_usage("/")
+
+    msg = f'Operation system: {os.name}\nDisc usage:\nTotal: {total / (1024**3):.2f} GB\nUsed: {used / (1024**3):.2f} GB\nFree: {free / (1024**3):.2f} GB'
+
+    await bot.delete_message(callback.from_user.id, callback.message.message_id)
+    await bot.send_message(callback.message.chat.id, msg, reply_markup=server_comm_keyboard())
+
+    # await bot.edit_message_media(
+    #     media=InputMediaPhoto(
+    #         media=FSInputFile(Paths.IMAGES.value.format(file=callback_data.language)),
+    #         caption=FileManager.read_file(Paths.MESSAGES, callback_data.language),
+    #     ),
+    #     chat_id=callback.from_user.id,
+    #     message_id=callback.message.message_id,
+    #     reply_markup=cancel_keyboard(),
+    # )
+
+@command_router.callback_query(CallbackServerMenu.filter(F.button == 'exec'))
+async def on_exec(callback: CallbackQuery, callback_data: CallbackServerMenu, state: FSMContext, bot: Bot):
+    print(callback_data.button)
+    await state.clear()
+    # await state.set_state(Translate.translate)
+
+    await state.set_state(Server.command)
+    await state.update_data(message_id=callback.message.message_id)
+
+    # await bot.send_message(callback.message.chat.id, 'Введите команду:', reply_markup=cancel_keyboard())
+
+    await bot.edit_message_text(
+        text='Введите команду:',
+        chat_id=callback.from_user.id,
+        message_id=callback.message.message_id,
+        reply_markup=cancel_keyboard()
+    )
+
+
+    # await bot.edit_message_media(
+    #     media=InputMediaPhoto(
+    #         media=FSInputFile(Paths.IMAGES.value.format(file=callback_data.language)),
+    #         caption=FileManager.read_file(Paths.MESSAGES, callback_data.language),
+    #     ),
+    #     chat_id=callback.from_user.id,
+    #     message_id=callback.message.message_id,
+    #     reply_markup=cancel_keyboard(),
+    # )
