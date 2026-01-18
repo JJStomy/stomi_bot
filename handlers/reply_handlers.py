@@ -117,6 +117,8 @@ async def wait_for_user_command(message: Message, state: FSMContext, bot: Bot):
     # msg_list = GPTMessage('gpt')
     # msg_list.update(GPTRole.USER, message.text)
 
+    err = False
+
     msg = message.text
     try:
         output = subprocess.run(msg.split(' '), capture_output=True, text=True)
