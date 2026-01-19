@@ -5,7 +5,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 import config
 from utils import Paths, FileManager
-from .callbacks import CallbackMainMenu, CallbackTalkMenu, CallbackQuizMenu, CallbackLangMenu, CallbackServerMenu
+from .callbacks import CallbackMainMenu, CallbackTalkMenu, CallbackQuizMenu, CallbackLangMenu
 
 Button = namedtuple('Button', ['text', 'callback'])
 

@@ -24,9 +24,6 @@ class GPTService:
     def _create_client(self):
         gpt_client = openai.AsyncOpenAI(
             api_key=self._gpt_token,
-            # http_client=httpx.AsyncClient(
-            #     proxy=self._proxy,
-            # )
         )
         return gpt_client
 
@@ -42,17 +39,3 @@ class GPTService:
                 chat_id=config.ADMIN_ID,
                 text=str(e),
             )
-
-    # async def transcript_voice(self, file, bot: Bot):
-    #     try:
-    #         with open(file, "rb") as audio_file:
-    #             transcript = await self._client.audio.transcriptions.create(
-    #                 model=GPTModel.WHISPER.value,
-    #                 file=audio_file
-    #             )
-    #             return transcript.text
-    #     except Exception as e:
-    #         await bot.send_message(
-    #             chat_id=config.ADMIN_ID,
-    #             text=str(e),
-    #         )

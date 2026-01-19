@@ -1,6 +1,8 @@
 #!/bin/bash
 # Перезапустить бота
 systemctl stop bot
-systemctl daemon-reload
-systemctl enable bot
-systemctl start bot
+
+# по сути только стоп, демон поднимется автоматически
+#systemctl daemon-reload
+#systemctl enable bot
+#systemctl start bot

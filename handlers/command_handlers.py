@@ -142,10 +142,6 @@ async def on_quiz(callback: CallbackQuery, callback_data: CallbackQuizMenu, stat
 
 @command_router.callback_query(CallbackMainMenu.filter(F.button == 'translate'))
 async def on_translate(callback: CallbackQuery, callback_data: CallbackMainMenu, state: FSMContext, bot: Bot):
-    # await state.clear()
-    # await state.set_state(GPTRequest.wait_for_request)
-    # await state.update_data(message_id=callback.message.message_id)
-
     await bot.edit_message_media(
         media=InputMediaPhoto(
             media=FSInputFile(Paths.IMAGES.value.format(file=callback_data.button)),
@@ -200,14 +196,4 @@ async def on_server(callback: CallbackQuery, callback_data: CallbackMainMenu, st
 
     await bot.delete_message(callback.from_user.id, callback.message.message_id)
     await bot.send_message(callback.message.chat.id, msg, reply_markup=server_comm_keyboard())
-
-    # await bot.edit_message_media(
-    #     media=InputMediaPhoto(
-    #         media=FSInputFile(Paths.IMAGES.value.format(file=callback_data.language)),
-    #         caption=FileManager.read_file(Paths.MESSAGES, callback_data.language),
-    #     ),
-    #     chat_id=callback.from_user.id,
-    #     message_id=callback.message.message_id,
-    #     reply_markup=cancel_keyboard(),
-    # )
 

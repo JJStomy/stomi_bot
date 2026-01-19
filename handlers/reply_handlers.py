@@ -1,5 +1,3 @@
-import subprocess
-
 from aiogram import Router, Bot
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, InputMediaPhoto
