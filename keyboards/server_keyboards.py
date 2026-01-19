@@ -10,7 +10,7 @@ def server_comm_keyboard():
     scripts = [file for file in os.listdir(Paths.SERVER.value)]
 
     for script in scripts:
-        text = FileManager.read_file(Paths.SERVER, script).split('\n', 1)[1].lstrip('# ')
+        text = FileManager.read_file(Paths.SERVER, script).split('\n', 2)[1].lstrip('# ')
         buttons.append(
             Button(text, CallbackServerMenu(button='server', command_type=script)),
         )
